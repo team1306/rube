@@ -1,6 +1,3 @@
-// NeoPixel Ring simple sketch (c) 2013 Shae Erisson
-// released under the GPLv3 license to match the rest of the AdaFruit NeoPixel library
-
 #include <Adafruit_NeoPixel.h>
 #include <Wire.h>
 #include <Servo.h>
@@ -9,31 +6,36 @@
   #include <avr/power.h>
 #endif
 
+//Constants for LED strips
 const int STRIP1_PIN = 11;
 const int STRIP1_NUM = 120;
 const int STRIP2_PIN = 11;
 const int STRIP2_NUM = 120;
 
+//Constants for trellis
 const int TRELLIS_PIN = 2;
 const int TRELLIS_KEYS = 16;
 const int LED_RESET_BUTTON = 15;
 
+//Constants for servo
 const int SERVO_PIN[] = {9};
 const int SERVO_OPEN = 180;
 const int SERVO_CLOSE = 0;
 const int SERVO_DELAY = 500;
 Servo servos[5];
 
-//Up to 255
+//LED Color (0-255)
 const int COLOR_R = 150;
 const int COLOR_G = 0;
 const int COLOR_B = 0;
 
+//Word and letter constants
 const int WORD_DELAY = 500;
 const int WORD_NUM[] = {25,24,24,24,24};
 const int LETTER_SPEED = 50;
 
 
+//Create neopixel strips and trellis
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(STRIP1_NUM, STRIP1_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_Trellis matrix0 = Adafruit_Trellis();
 Adafruit_TrellisSet trellis =  Adafruit_TrellisSet(&matrix0);
@@ -41,28 +43,18 @@ Adafruit_TrellisSet trellis =  Adafruit_TrellisSet(&matrix0);
 int delayval = 50; // delay for half a second
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600); //Set logging baud rate
 
   Servo servo1;
-  servo1.attach(SERVO_PIN[0]);
-  servo1.write(0);
-
-  servos[0] = {servo1};
+  setupServo(servo1, 0);
+  //servo1.attach(SERVO_PIN[0]);
+  //servo1.write(0);
+  //servos[0] = {servo1};
   
   pinMode(TRELLIS_PIN, INPUT);
   digitalWrite(TRELLIS_PIN, HIGH);
   trellis.begin(0x70);
-  for (uint8_t i=0; i<TRELLIS_KEYS; i++) {
-    trellis.setLED(i);
-    trellis.writeDisplay();    
-    delay(50);
-  }
-  // then turn them off
-  for (uint8_t i=0; i<TRELLIS_KEYS; i++) {
-    trellis.clrLED(i);
-    trellis.writeDisplay();    
-    delay(50);
-  }
+  trellisBootLights();
   
   pixels.begin();
   clearLEDs();
@@ -70,7 +62,6 @@ void setup() {
 
 void loop() {
   delay(30);
-
     if (trellis.readSwitches()) {
       for (uint8_t i=0; i<TRELLIS_KEYS; i++) {
         if (trellis.justPressed(i)) {
@@ -96,7 +87,6 @@ void loop() {
           //offWord(i);
         }
       }
-      // tell the trellis to set the LEDs we requested
       trellis.writeDisplay();
     }
   
@@ -110,6 +100,28 @@ void loop() {
     delay(delayval); // Delay for a period of time (in milliseconds).
 
   }*/
+}
+
+void trellisBootLights() {
+  //Trellis lights on
+  for (uint8_t i=0; i<TRELLIS_KEYS; i++) {
+    trellis.setLED(i);
+    trellis.writeDisplay();    
+    delay(50);
+  }
+  
+  //Trellis lights off
+  for (uint8_t i=0; i<TRELLIS_KEYS; i++) {
+    trellis.clrLED(i);
+    trellis.writeDisplay();    
+    delay(50);
+  }
+}
+
+void setupServo(Servo servo, int servoNum) {
+  servo.attach(SERVO_PIN[servoNum]);
+  servo.write(0);
+  servos[servoNum] = servo;
 }
 
 void servo(int s) {
