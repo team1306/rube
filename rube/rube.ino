@@ -18,14 +18,14 @@ const int TRELLIS_KEYS = 16;
 const int LED_RESET_BUTTON = 15;
 
 //Constants for servo
-const int SERVO_PIN[] = {9};
-const int SERVO_OPEN = 180;
-const int SERVO_CLOSE = 0;
-const int SERVO_DELAY = 500;
 Servo servos[5];
+const int SERVO_PIN[] = {14};
+const int SERVO_OPEN[] = {60};
+const int SERVO_CLOSE[] = {30};
+const int SERVO_DELAY = 500;
 
 //LED Color (0-255)
-const int COLOR_R = 150;
+const int COLOR_R = 255;
 const int COLOR_G = 0;
 const int COLOR_B = 0;
 
@@ -60,34 +60,36 @@ void setup() {
   clearLEDs();
 }
 
+int servoIndex = 0;
 void loop() {
   delay(30);
     if (trellis.readSwitches()) {
       for (uint8_t i=0; i<TRELLIS_KEYS; i++) {
         if (trellis.justPressed(i)) {
           trellis.setLED(i);
-          Serial.print("v"); Serial.println(i);
-          if (i<sizeof(servos)) {
-            servo(i);
-            delay(WORD_DELAY);
-          }
+          trellis.writeDisplay();
+          //Serial.print("v"); Serial.println(i);
           if (i == LED_RESET_BUTTON) {
             clearLEDs();
           }
+          else if (i<sizeof(servos) && (i%2==1)) {
+            servo(servoIndex);
+            servoIndex++;
+          }
           else {
             lightWord(i);
+            delay(WORD_DELAY);
           }
         } 
         // if it was released, turn it off
         if (trellis.justReleased(i)) {
-          Serial.print("^"); Serial.println(i);
+          //Serial.print("^"); Serial.println(i);
           //pixels.setPixelColor(i, pixels.Color(0,0,0));
           //pixels.show();
-          trellis.clrLED(i);
+          //trellis.clrLED(i);
           //offWord(i);
         }
       }
-      trellis.writeDisplay();
     }
   
   /*for(int i=0;i<STRIP1_NUM;i++){
@@ -127,9 +129,9 @@ void setupServo(Servo servo, int servoNum) {
 void servo(int s) {
   Serial.print("SERVO ");
   Serial.println(s);
-  servos[s].write(SERVO_OPEN);
+  servos[s].write(SERVO_OPEN[s]);
   delay(SERVO_DELAY);
-  servos[s].write(SERVO_CLOSE);
+  servos[s].write(SERVO_CLOSE[s]);
 }
 
 void clearLEDs() {
@@ -137,6 +139,10 @@ void clearLEDs() {
     pixels.setPixelColor(i, pixels.Color(0,0,0));
     pixels.show();
   }
+  for (int i=0; i<TRELLIS_KEYS; i++) {
+    trellis.clrLED(i);
+  }
+  trellis.writeDisplay();
    /*for (int i=0; i<STRIP2_NUM; i++) {
     pixels.setPixelColor(i+prevLEDs, pixels.Color(0,0,0));
     pixels.show();
