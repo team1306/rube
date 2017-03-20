@@ -19,9 +19,9 @@ const int LED_RESET_BUTTON = 15;
 
 //Constants for servo
 Servo servos[5];
-const int SERVO_PIN[] = {14};
-const int SERVO_OPEN[] = {60};
-const int SERVO_CLOSE[] = {30};
+const int SERVO_PIN[] = {A0,A1,A2};
+const int SERVO_CLOSE[] = {0,0,0};
+const int SERVO_OPEN[] = {60,60,60};
 const int SERVO_DELAY = 500;
 
 //LED Color (0-255)
@@ -30,8 +30,11 @@ const int COLOR_G = 0;
 const int COLOR_B = 0;
 
 //Word and letter constants
+enum WORDS {CREATE, TEACH, LEARN, INSPIRE, GROW};
+const int WORD_START[] = {0, 93, 71};
 const int WORD_DELAY = 500;
-const int WORD_NUM[] = {25,24,24,24,24};
+const int WORD_NUM[] = {21,27,23,22,25};  //Learn, Inspire, Grow, Teach, Create
+const int WORD_ORDER[] = {4,3,0,1,2};     //Create, Teach, Learn, Inspire, Grow
 const int LETTER_SPEED = 50;
 
 
@@ -45,8 +48,10 @@ int delayval = 50; // delay for half a second
 void setup() {
   Serial.begin(9600); //Set logging baud rate
 
-  Servo servo1;
+  Servo servo1, servo2, servo3;
   setupServo(servo1, 0);
+  setupServo(servo2, 1);
+  setupServo(servo3, 2);
   //servo1.attach(SERVO_PIN[0]);
   //servo1.write(0);
   //servos[0] = {servo1};
@@ -122,7 +127,9 @@ void trellisBootLights() {
 
 void setupServo(Servo servo, int servoNum) {
   servo.attach(SERVO_PIN[servoNum]);
-  servo.write(0);
+  Serial.print("Atached Servo: ");
+  Serial.println(SERVO_PIN[servoNum]);
+  //servo.write(SERVO_CLOSE[servoNum]);
   servos[servoNum] = servo;
 }
 
@@ -150,6 +157,7 @@ void clearLEDs() {
 }
 
 void lightWord(int lightWord) {
+  int wordI = WORD_ORDER[lightWord];
   int LEDs = WORD_NUM[lightWord];
   int prevLEDs = 0;
   for (int i=0; i<lightWord; i++) {
