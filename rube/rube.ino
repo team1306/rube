@@ -30,11 +30,11 @@ const int COLOR_G = 0;
 const int COLOR_B = 0;
 
 //Word and letter constants
-enum WORDS {CREATE, TEACH, LEARN, INSPIRE, GROW};
-const int WORD_START[] = {0, 93, 71};
+const int WORD_START[] = {93, 71, 0, 21, 47, 48};
+const int WORD_END[] = {117, 92, 21, 47, 70};
 const int WORD_DELAY = 500;
-const int WORD_NUM[] = {21,27,23,22,25};  //Learn, Inspire, Grow, Teach, Create
-const int WORD_ORDER[] = {4,3,0,1,2};     //Create, Teach, Learn, Inspire, Grow
+//const int WORD_NUM[] = {21,27,23,22,25};  //Learn, Inspire, Grow, Teach, Create
+//const int WORD_ORDER[] = {4,3,0,1,2};     //Create, Teach, Learn, Inspire, Grow
 const int LETTER_SPEED = 50;
 
 
@@ -44,6 +44,7 @@ Adafruit_Trellis matrix0 = Adafruit_Trellis();
 Adafruit_TrellisSet trellis =  Adafruit_TrellisSet(&matrix0);
 
 int delayval = 50; // delay for half a second
+static int currentWord = 0;
 
 void setup() {
   Serial.begin(9600); //Set logging baud rate
@@ -82,8 +83,8 @@ void loop() {
             servoIndex++;
           }
           else {
-            lightWord(i);
-            delay(WORD_DELAY);
+            lightNextWord();
+            //delay(WORD_DELAY);
           }
         } 
         // if it was released, turn it off
@@ -150,13 +151,19 @@ void clearLEDs() {
     trellis.clrLED(i);
   }
   trellis.writeDisplay();
-   /*for (int i=0; i<STRIP2_NUM; i++) {
-    pixels.setPixelColor(i+prevLEDs, pixels.Color(0,0,0));
-    pixels.show();
-  }*/
 }
 
-void lightWord(int lightWord) {
+void lightNextWord() {
+  int startLED = WORD_START[currentWord];
+  int endLED = WORD_END[currentWord];
+  int numLED = endLED-startLED-1; //-1 to account for 0 indexing
+  int prevLEDs = 0;
+  for (int i=0; i<numLED; i++) {
+    pixels.setPixelColor(startLED+i, pixels.Color(COLOR_R,COLOR_G,COLOR_B));
+  }
+}
+
+void lightWord() {
   int wordI = WORD_ORDER[lightWord];
   int LEDs = WORD_NUM[lightWord];
   int prevLEDs = 0;
