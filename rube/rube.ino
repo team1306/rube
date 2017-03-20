@@ -18,11 +18,11 @@ const int TRELLIS_KEYS = 16;
 const int LED_RESET_BUTTON = 15;
 
 //Constants for servo
-Servo servos[5];
+Servo servos[3];
 const int SERVO_PIN[] = {A0,A1,A2};
 const int SERVO_CLOSE[] = {0,0,0};
 const int SERVO_OPEN[] = {60,60,60};
-const int SERVO_DELAY = 500;
+const int SERVO_DELAY = 10000;
 
 //LED Color (0-255)
 const int COLOR_R = 255;
@@ -48,6 +48,7 @@ static int currentWord = 0;
 
 void setup() {
   Serial.begin(9600); //Set logging baud rate
+  Serial.println("RUBY STARTING!");
 
   Servo servo1, servo2, servo3;
   setupServo(servo1, 0);
@@ -86,14 +87,6 @@ void loop() {
             lightNextWord();
             //delay(WORD_DELAY);
           }
-        } 
-        // if it was released, turn it off
-        if (trellis.justReleased(i)) {
-          //Serial.print("^"); Serial.println(i);
-          //pixels.setPixelColor(i, pixels.Color(0,0,0));
-          //pixels.show();
-          //trellis.clrLED(i);
-          //offWord(i);
         }
       }
     }
@@ -130,7 +123,7 @@ void setupServo(Servo servo, int servoNum) {
   servo.attach(SERVO_PIN[servoNum]);
   Serial.print("Atached Servo: ");
   Serial.println(SERVO_PIN[servoNum]);
-  //servo.write(SERVO_CLOSE[servoNum]);
+  servo.write(SERVO_CLOSE[servoNum]);
   servos[servoNum] = servo;
 }
 
@@ -138,8 +131,8 @@ void servo(int s) {
   Serial.print("SERVO ");
   Serial.println(s);
   servos[s].write(SERVO_OPEN[s]);
-  delay(SERVO_DELAY);
-  servos[s].write(SERVO_CLOSE[s]);
+//  delay(SERVO_DELAY);
+//  servos[s].write(SERVO_CLOSE[s]);
 }
 
 void clearLEDs() {
@@ -163,32 +156,32 @@ void lightNextWord() {
   }
 }
 
-void lightWord() {
-  int wordI = WORD_ORDER[lightWord];
-  int LEDs = WORD_NUM[lightWord];
-  int prevLEDs = 0;
-  for (int i=0; i<lightWord; i++) {
-    prevLEDs+=WORD_NUM[i];
-  }
-  for (int i=0; i<LEDs; i++) {
-    pixels.setPixelColor(i+prevLEDs, pixels.Color(COLOR_R,COLOR_G,COLOR_B));
-    pixels.show();
-    delay(LETTER_SPEED);
-  }
-}
-void offWord(int lightWord) {
-  int LEDs = WORD_NUM[lightWord];
-  int prevLEDs = 0;
-  int c = 0;
-  for (int i=0; i<lightWord; i++) {
-    prevLEDs+=WORD_NUM[i];
-  }
-    Serial.print("Found words");
-    Serial.println(prevLEDs);
-  for (int i=0; i<LEDs; i++) {
-    pixels.setPixelColor(i+prevLEDs, pixels.Color(0,0,0));
-    pixels.show();
-    delay(LETTER_SPEED);
-  }
-}
+//void lightWord() {
+//  int wordI = WORD_ORDER[lightWord];
+//  int LEDs = WORD_NUM[lightWord];
+//  int prevLEDs = 0;
+//  for (int i=0; i<lightWord; i++) {
+//    prevLEDs+=WORD_NUM[i];
+//  }
+//  for (int i=0; i<LEDs; i++) {
+//    pixels.setPixelColor(i+prevLEDs, pixels.Color(COLOR_R,COLOR_G,COLOR_B));
+//    pixels.show();
+//    delay(LETTER_SPEED);
+//  }
+//}
+//void offWord(int lightWord) {
+//  int LEDs = WORD_NUM[lightWord];
+//  int prevLEDs = 0;
+//  int c = 0;
+//  for (int i=0; i<lightWord; i++) {
+//    prevLEDs+=WORD_NUM[i];
+//  }
+//    Serial.print("Found words");
+//    Serial.println(prevLEDs);
+//  for (int i=0; i<LEDs; i++) {
+//    pixels.setPixelColor(i+prevLEDs, pixels.Color(0,0,0));
+//    pixels.show();
+//    delay(LETTER_SPEED);
+//  }
+//}
 
