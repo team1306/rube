@@ -1,6 +1,5 @@
 #include <Adafruit_NeoPixel.h>
 #include <Wire.h>
-#include <Servo.h>
 #include "Adafruit_Trellis.h"
 #ifdef __AVR__
   #include <avr/power.h>
@@ -18,11 +17,11 @@ const int TRELLIS_KEYS = 16;
 const int LED_RESET_BUTTON = 15;
 
 //Constants for servo
-Servo *servos[3];
-const int SERVO_PIN[] = {A0,A1,A2};
-const int SERVO_CLOSE[] = {20,90,90};
-const int SERVO_OPEN[] = {100,0,0};
-const int SERVO_DELAY = 2000;
+//Servo *servos[3];
+//const int SERVO_PIN[] = {A0,A1,A2};
+//const int SERVO_CLOSE[] = {20,90,90};
+//const int SERVO_OPEN[] = {100,0,0};
+//const int SERVO_DELAY = 2000;
 
 //LED Color (0-255)
 const int COLOR_R = 255;
@@ -51,33 +50,6 @@ void setup() {
   Serial.begin(9600); //Set logging baud rate
   Serial.println("RUBY STARTING!");
 
-  Servo *servo1, *servo2, *servo3;
-
-  servo1 = new Servo();
-  servo2 = new Servo();
-  servo3 = new Servo();
-  
-  servo1->attach(A0, 1000, 2000);
-  servo2->attach(A1, 1000, 2000);
-  servo3->attach(A2, 1000, 2000);
-
-  servo1->write(0);
-  servo2->write(0);
-  servo3->write(0);
-  
-  Serial.print("Atached Servo: ");
-  Serial.println(SERVO_PIN[0]);
-  //servo.write(SERVO_CLOSE[servoNum]);
-  servos[0] = servo1;
-  servos[1] = servo2;
-  servos[2] = servo3;
-  //setupServo(servo1, 0);
-  //setupServo(servo2, 1);
-  //setupServo(servo3, 2);
-  //servo1.attach(SERVO_PIN[0]);
-  //servo1.write(0);
-  //servos[0] = {servo1};
-  
   pinMode(TRELLIS_PIN, INPUT);
   digitalWrite(TRELLIS_PIN, HIGH);
   trellis.begin(0x70);
@@ -98,19 +70,6 @@ void loop() {
           if (i == LED_RESET_BUTTON) {
             clearLEDs();
           }
-          else if (i==1) {
-            servo(0);
-          }
-          else if (i==3) {
-            servo(1);
-          }
-          else if (i==5) {
-            servo(2);
-          }
-//          else if (i<3 && (i%2==1)) {
-//            servo(servoIndex);
-//            servoIndex++;
-//          }
           else {
             Serial.print("Light word: ");
             Serial.println(currentWord);
@@ -120,17 +79,6 @@ void loop() {
         }
       }
     }
-  
-  /*for(int i=0;i<STRIP1_NUM;i++){
-
-    // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-    pixels.setPixelColor(i, pixels.Color(COLOR_R,COLOR_G,COLOR_B)); // Moderately bright green color.
-
-    pixels.show(); // This sends the updated pixel color to the hardware.
-
-    delay(delayval); // Delay for a period of time (in milliseconds).
-
-  }*/
 }
 
 void trellisBootLights() {
@@ -147,22 +95,6 @@ void trellisBootLights() {
     trellis.writeDisplay();    
     delay(50);
   }
-}
-
-void setupServo(Servo *servo, int servoNum) {
-  servo->attach(SERVO_PIN[servoNum]);
-  Serial.print("Atached Servo: ");
-  Serial.println(SERVO_PIN[servoNum]);
-  //servo.write(SERVO_CLOSE[servoNum]);
-  servos[servoNum] = servo;
-}
-
-void servo(int s) {
-  Serial.print("SERVO ");
-  Serial.println(s);
-  servos[s]->write(SERVO_OPEN[s]);
-  delay(SERVO_DELAY);
-  servos[s]->write(SERVO_CLOSE[s]);
 }
 
 void clearLEDs() {
@@ -189,33 +121,4 @@ void lightNextWord() {
   }
   currentWord++;
 }
-
-//void lightWord() {
-//  int wordI = WORD_ORDER[lightWord];
-//  int LEDs = WORD_NUM[lightWord];
-//  int prevLEDs = 0;
-//  for (int i=0; i<lightWord; i++) {
-//    prevLEDs+=WORD_NUM[i];
-//  }
-//  for (int i=0; i<LEDs; i++) {
-//    pixels.setPixelColor(i+prevLEDs, pixels.Color(COLOR_R,COLOR_G,COLOR_B));
-//    pixels.show();
-//    delay(LETTER_SPEED);
-//  }
-//}
-//void offWord(int lightWord) {
-//  int LEDs = WORD_NUM[lightWord];
-//  int prevLEDs = 0;
-//  int c = 0;
-//  for (int i=0; i<lightWord; i++) {
-//    prevLEDs+=WORD_NUM[i];
-//  }
-//    Serial.print("Found words");
-//    Serial.println(prevLEDs);
-//  for (int i=0; i<LEDs; i++) {
-//    pixels.setPixelColor(i+prevLEDs, pixels.Color(0,0,0));
-//    pixels.show();
-//    delay(LETTER_SPEED);
-//  }
-//}
 
