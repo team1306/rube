@@ -9,8 +9,8 @@
 //Constants for LED strips
 const int STRIP1_PIN = 11;
 const int STRIP1_NUM = 120;
-const int STRIP2_PIN = 11;
-const int STRIP2_NUM = 120;
+//const int STRIP2_PIN = 11;
+//const int STRIP2_NUM = 118;
 
 //Constants for trellis
 const int TRELLIS_PIN = 2;
@@ -18,11 +18,11 @@ const int TRELLIS_KEYS = 16;
 const int LED_RESET_BUTTON = 15;
 
 //Constants for servo
-Servo servos[3];
+Servo *servos[3];
 const int SERVO_PIN[] = {A0,A1,A2};
-const int SERVO_CLOSE[] = {0,0,0};
-const int SERVO_OPEN[] = {60,60,60};
-const int SERVO_DELAY = 10000;
+const int SERVO_CLOSE[] = {20,90,90};
+const int SERVO_OPEN[] = {100,0,0};
+const int SERVO_DELAY = 2000;
 
 //LED Color (0-255)
 const int COLOR_R = 255;
@@ -31,11 +31,11 @@ const int COLOR_B = 0;
 
 //Word and letter constants
 const int WORD_START[] = {93, 71, 0, 21, 47, 48};
-const int WORD_END[] = {117, 92, 21, 47, 70};
+const int WORD_END[] = {119, 92, 21, 47, 70};
 const int WORD_DELAY = 500;
 //const int WORD_NUM[] = {21,27,23,22,25};  //Learn, Inspire, Grow, Teach, Create
 //const int WORD_ORDER[] = {4,3,0,1,2};     //Create, Teach, Learn, Inspire, Grow
-const int LETTER_SPEED = 50;
+const int LETTER_SPEED = 500;
 
 
 //Create neopixel strips and trellis
@@ -45,15 +45,35 @@ Adafruit_TrellisSet trellis =  Adafruit_TrellisSet(&matrix0);
 
 int delayval = 50; // delay for half a second
 static int currentWord = 0;
+static int servoIndex = 0;
 
 void setup() {
   Serial.begin(9600); //Set logging baud rate
   Serial.println("RUBY STARTING!");
 
-  Servo servo1, servo2, servo3;
-  setupServo(servo1, 0);
-  setupServo(servo2, 1);
-  setupServo(servo3, 2);
+  Servo *servo1, *servo2, *servo3;
+
+  servo1 = new Servo();
+  servo2 = new Servo();
+  servo3 = new Servo();
+  
+  servo1->attach(A0, 1000, 2000);
+  servo2->attach(A1, 1000, 2000);
+  servo3->attach(A2, 1000, 2000);
+
+  servo1->write(0);
+  servo2->write(0);
+  servo3->write(0);
+  
+  Serial.print("Atached Servo: ");
+  Serial.println(SERVO_PIN[0]);
+  //servo.write(SERVO_CLOSE[servoNum]);
+  servos[0] = servo1;
+  servos[1] = servo2;
+  servos[2] = servo3;
+  //setupServo(servo1, 0);
+  //setupServo(servo2, 1);
+  //setupServo(servo3, 2);
   //servo1.attach(SERVO_PIN[0]);
   //servo1.write(0);
   //servos[0] = {servo1};
@@ -67,7 +87,6 @@ void setup() {
   clearLEDs();
 }
 
-int servoIndex = 0;
 void loop() {
   delay(30);
     if (trellis.readSwitches()) {
@@ -75,15 +94,26 @@ void loop() {
         if (trellis.justPressed(i)) {
           trellis.setLED(i);
           trellis.writeDisplay();
-          //Serial.print("v"); Serial.println(i);
+          Serial.print("v"); Serial.println(i);
           if (i == LED_RESET_BUTTON) {
             clearLEDs();
           }
-          else if (i<sizeof(servos) && (i%2==1)) {
-            servo(servoIndex);
-            servoIndex++;
+          else if (i==1) {
+            servo(0);
           }
+          else if (i==3) {
+            servo(1);
+          }
+          else if (i==5) {
+            servo(2);
+          }
+//          else if (i<3 && (i%2==1)) {
+//            servo(servoIndex);
+//            servoIndex++;
+//          }
           else {
+            Serial.print("Light word: ");
+            Serial.println(currentWord);
             lightNextWord();
             //delay(WORD_DELAY);
           }
@@ -119,20 +149,20 @@ void trellisBootLights() {
   }
 }
 
-void setupServo(Servo servo, int servoNum) {
-  servo.attach(SERVO_PIN[servoNum]);
+void setupServo(Servo *servo, int servoNum) {
+  servo->attach(SERVO_PIN[servoNum]);
   Serial.print("Atached Servo: ");
   Serial.println(SERVO_PIN[servoNum]);
-  servo.write(SERVO_CLOSE[servoNum]);
+  //servo.write(SERVO_CLOSE[servoNum]);
   servos[servoNum] = servo;
 }
 
 void servo(int s) {
   Serial.print("SERVO ");
   Serial.println(s);
-  servos[s].write(SERVO_OPEN[s]);
-//  delay(SERVO_DELAY);
-//  servos[s].write(SERVO_CLOSE[s]);
+  servos[s]->write(SERVO_OPEN[s]);
+  delay(SERVO_DELAY);
+  servos[s]->write(SERVO_CLOSE[s]);
 }
 
 void clearLEDs() {
@@ -144,6 +174,8 @@ void clearLEDs() {
     trellis.clrLED(i);
   }
   trellis.writeDisplay();
+  currentWord = 0;
+  servoIndex = 0;
 }
 
 void lightNextWord() {
@@ -152,8 +184,10 @@ void lightNextWord() {
   int numLED = endLED-startLED-1; //-1 to account for 0 indexing
   int prevLEDs = 0;
   for (int i=0; i<numLED; i++) {
-    pixels.setPixelColor(startLED+i, pixels.Color(COLOR_R,COLOR_G,COLOR_B));
+    pixels.setPixelColor(startLED+i, pixels.Color(255,0,0));
+    pixels.show();
   }
+  currentWord++;
 }
 
 //void lightWord() {
