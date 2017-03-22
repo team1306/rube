@@ -30,7 +30,7 @@ const int COLOR_B = 0;
 
 //Word and letter constants
 const int WORD_START[] = {93, 71, 0, 21, 47, 48};
-const int WORD_END[] = {119, 92, 21, 47, 70};
+const int WORD_END[] = {119, 94, 22, 49, 72};
 const int WORD_DELAY = 500;
 //const int WORD_NUM[] = {21,27,23,22,25};  //Learn, Inspire, Grow, Teach, Create
 //const int WORD_ORDER[] = {4,3,0,1,2};     //Create, Teach, Learn, Inspire, Grow
